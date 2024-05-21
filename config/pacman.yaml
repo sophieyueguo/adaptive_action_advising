@@ -1,0 +1,114 @@
+{
+
+    "MODEL_CONFIG": {
+    "custom_model": "actor_critic",
+    "custom_model_config": {
+        "critic_share_layers": False,
+        "input_conv_channels": 1,
+        "conv_filters": [
+            [32, [1, 1], 1],
+        ],
+        "input_embedding": "linear",
+        "input_layer_sizes": [[24, 32]], # "input_layer_sizes": [[13, 32]],
+        "actor_layer_sizes": [[3456, 4]],
+        "critic_layer_sizes": [[3456, 1]],
+        "hidden_layer_sizes": [[32, 32]],
+        "value_layer_sizes": [[32, 1]],
+        "action_masking": False,
+        "activation_fn": "relu"
+        },
+    },
+
+    
+
+
+
+
+
+    # Environment configuration
+    "ENV_CONFIG": {
+        "teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/pacman_basic/model3.pth",
+        "teacher_dt_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/pacman_basic/distilled_tree3.pickle",
+        "advice_budget": 10000000000000000,
+        "advice_mode": "None", # in the set of {None, "aa", "eaa", "fixed"}
+        "advice_strategy": "e", # in the set of {e, a, i, m}
+        "introspection_decay_rate": 1.0,
+        "fixed_advise_type": "reuse_budget", #'q_change', # in the set of {'reuse_budget', 'decay_reuse', 'q_change'}
+        "multiagent": False,
+    },
+
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "pacman",
+        "alg": "ppo",
+
+        "num_gpus": 1,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", # Only torch supported
+
+        # "lr": 0.00005, 
+        "lr_schedule": [
+            [0, 0.001],       # Start with a learning rate of 0.0002
+            [200000, 0.00005],
+            [500000, 0.000001],
+        ],  
+        "lambda": 0.7, #0.7, 
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.2,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        #"entropy_coeff": 0.01,
+        "entropy_coeff_schedule": [
+            [0, 0.012],       # Start with an entropy coefficient of 0.01
+            [500000, 0.006], # Linearly decrease to 0.001 by step 500,000
+        ],
+        "train_batch_size": 1000, #5000,
+        "rollout_fragment_length": 100,
+        "sgd_minibatch_size": 100, #500,
+        "num_sgd_iter": 10, #20,
+
+        "num_workers": 5, #3,
+        "num_envs_per_worker": 1, #3,
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "horizon": 600,
+
+        "advice_mode": 'never_advise', #adaptive_decay_advise, #"decay_advise", # "never_advise",
+
+        #"teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_model/pacman_test/tmp_teacher",
+        "teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_model/pacman_test/chase_ghost",
+
+        #"pre_trained_model": "/home/glow/ray_results/AdvisedTrainer_2024-02-26_13-02-33/AdvisedTrainer_pacman_36f89_00000_0_2024-02-26_13-02-33/checkpoint_000500/model",
+
+        "advice_decay_rate": 0.99996, 
+        "advice_decay_step": 0.00005,  
+        "use_linear_advice_decay": False,
+        "follow_teacher_prob": 1.0, 
+        "initial_follow_teacher_prob": 0.83,
+        "advising_max_step": 40000, 
+
+        "run_inner_loop": True,
+        "inner_loop_config": "pacman_teacher",
+        "inner_loop_frequency": 500, # in timesteps
+        "burn_in": 0,
+
+
+        "teacher_training_stop_timestep": 1000, 
+        "teacher_training_iterations": 150, #100, 
+
+        "adaptive_teacher_advising_period_steps": 2000,
+        "adaptive_teacher_initial_advising_rate": 0,  
+    },
+
+
+    "HPO_CONFIG": {
+        "advice_decay_step": "tune.grid_search([0.00002, 0.00001, 0.0000005, 0.00000025])",
+        "initial_follow_teacher_prob": "tune.grid_search([1.0, 0.75, 0.5])",
+        "advising_max_step": "tune.grid_search([150000, 100000, 50000])",
+        "lr": "tune.grid_search([0.000075, 0.00015, 0.0003])", 
+    }
+}

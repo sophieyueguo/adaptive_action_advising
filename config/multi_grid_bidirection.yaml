@@ -1,0 +1,114 @@
+{
+    # Model configuration
+    "MODEL_CONFIG": {
+        "custom_model": "actor_critic",
+        "custom_model_config": {
+            "input_conv_channels": 3,
+            "critic_share_layers": False,
+            "conv_filters": [
+                [32, [2, 2], 1],
+                ["pool", [2, 2], 2],
+                [64, [2, 2], 1],
+                [128, [2, 2], 1],
+            ],
+            "actor_layer_sizes": [[3200, 7]],
+            "critic_layer_sizes": [[3200, 1]],
+            "action_masking": True,
+        },
+    },
+
+
+    # Environment configuration
+    "ENV_CONFIG": {
+        "advice_mode": "",
+        # icra layout
+        "config": [["wwww"]],
+          
+        "start_rooms": [[0, 0]
+                        ],
+
+        # anywhere
+        "goal_rooms": [[0, 0]
+                        ],
+
+        "room_size": 10,
+        "max_steps": 100,
+        "exploration_bonus": False,
+
+        "num_rubble": 0,
+        "rubble_reward": 0,
+    },
+
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "multi_grid_bidirection",
+        "alg": "ppo",
+
+        "num_gpus": 1,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", # Only torch supported
+
+        
+        "lr": 0.00001,
+        # "lr_schedule": [
+        #     [0, 0.0002],      
+        #     [150000, 0.00001],  
+        # ],
+        "lambda": 0.8,
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.2,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        "entropy_coeff": 0.01, 
+        "train_batch_size": 512, 
+        "sgd_minibatch_size": 256,
+        "num_sgd_iter": 3,
+        "num_workers": 5, 
+        "num_envs_per_worker": 5, 
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "use_gae": True,
+        "batch_mode": "truncate_episodes",
+
+        "advice_mode": "never_advise", 
+        #"never_advise",
+        #[adaptive_always_advise, adaptive_decay_advise] 
+        #[always_advise, never_advise, decay_advise]
+        
+        "advice_decay_rate": 0.999997, #0.9999986, #for fixed policies
+        "advice_decay_step": 0.0000005, #0.000001,  
+        "use_linear_advice_decay": False,
+        "follow_teacher_prob": 0.8, 
+        "initial_follow_teacher_prob": 0.8,
+        "advising_max_step": 300000, 
+
+        # the teacher model path must be the full path, not relative path. 
+        # "teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/bidirection_br/model",
+        #"teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/bidirection_tl/model",
+        "pre_trained_model":"/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/bidirection_tl/model",
+
+        "run_inner_loop": True,
+        "inner_loop_config": "multi_grid_bidirection_teacher",
+        "inner_loop_frequency": 4000, # in timesteps
+        "burn_in": 0,
+
+
+        "teacher_training_stop_timestep": 40000, 
+        "teacher_training_iterations": 500, #150, 
+
+        "adaptive_teacher_advising_period_steps": 3000,
+        "adaptive_teacher_initial_advising_rate": 0,  
+
+    },
+
+    #  "HPO_CONFIG": {
+    #     "advice_mode": "tune.grid_search([\"decay_advise\", \"never_advise\"])", 
+    # }
+
+    
+
+}

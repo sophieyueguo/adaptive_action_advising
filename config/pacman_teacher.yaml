@@ -1,0 +1,90 @@
+{
+
+    "MODEL_CONFIG": {
+    "custom_model": "actor_critic",
+    "custom_model_config": {
+        "critic_share_layers": False,
+        "input_conv_channels": 1,
+        "conv_filters": [
+            [32, [1, 1], 1],
+        ],
+        "input_embedding": "linear",
+        "input_layer_sizes": [[24, 32]], # "input_layer_sizes": [[13, 32]],
+        "actor_layer_sizes": [[3456, 4]],
+        "critic_layer_sizes": [[3456, 1]],
+        "hidden_layer_sizes": [[32, 32]],
+        "value_layer_sizes": [[32, 1]],
+        "action_masking": False,
+        "activation_fn": "relu"
+        },
+    },
+
+    
+
+
+
+
+
+    # Environment configuration
+    "ENV_CONFIG": {
+        "teacher_model_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/pacman_basic/model3.pth",
+        "teacher_dt_path": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/pacman_basic/distilled_tree3.pickle",
+        "advice_budget": 0,
+        "advice_mode": "None", # in the set of {None, "aa", "eaa", "fixed"}
+        "advice_strategy": "e", # in the set of {e, a, i, m}
+        "introspection_decay_rate": 1.0,
+        "fixed_advise_type": "reuse_budget", #'q_change', # in the set of {'reuse_budget', 'decay_reuse', 'q_change'}
+        "multiagent": False,
+    },
+
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "pacman_teacher",
+        "alg": "ppo",
+
+        "num_gpus": 0,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", # Only torch supported
+
+        # "lr": 0.0001,
+        "lr_schedule": [
+            [0, 0.0006],      
+            [350000, 0.00005],
+        ],
+        
+        "lambda": 0.8,
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.2,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        "entropy_coeff": 0.011,
+        "train_batch_size": 5000,
+        "rollout_fragment_length": 100,
+        "sgd_minibatch_size": 500,
+        "num_sgd_iter": 10,
+
+        "num_workers": 0,
+        "num_envs_per_worker": 5,
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "horizon": 600,
+
+        "advice_mode": "never_advise",
+    },
+
+
+    # Hyper parameter optimization parameters
+    "HPO_CONFIG": {
+        "lr": "tune.grid_search([0.001, 0.0005, 0.0001])",
+        "lambda": "tune.grid_search([0.8, 0.9, 0.99])",
+        "kl_coeff": "tune.grid_search([0.1, 0.5, 0.9])",
+        "clip_param": "tune.grid_search([0.1, 0.2, 0.3])",
+        "vf_loss_coeff": "tune.grid_search([0.5, 0.75, 1.0])",
+        "entropy_coeff": "tune.grid_search([0.1, 0.01, 0.0])",
+        "num_sgd_iter": "tune.grid_search([3, 10, 20])",
+    }
+}

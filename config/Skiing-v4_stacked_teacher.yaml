@@ -1,0 +1,65 @@
+{
+    # Model configuration
+    "MODEL_CONFIG": {
+        "custom_model": "actor_critic",
+        "custom_model_config": {
+            "input_conv_channels": 4,
+            "critic_share_layers": False,
+            "conv_filters": [
+                [16, [4, 2], 1],
+                ["pool", [2, 2], 2],
+                [16, [2, 2], 1],
+                [32, [2, 2], 1],
+            ],
+            "actor_layer_sizes": [[52480, 3]],
+            "critic_layer_sizes": [[52480, 1]],
+            "action_masking": False,
+            "full_action_space": False
+        },
+    },
+    # "MODEL_CONFIG": {},
+
+    "ENV_CONFIG": {
+        # "max_steps": 1500,
+    },
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "Skiing-v4_stacked_teacher",
+        "alg": "ppo",
+
+        "num_gpus": 1,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", # Only torch supported
+
+        "lr": 0.0005,
+        "lambda": 1.0,
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.1,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        "entropy_coeff": 0.005, 
+        "train_batch_size": 4196, 
+        "sgd_minibatch_size": 256,
+        "num_sgd_iter": 4,
+        "num_workers": 0, 
+        "num_envs_per_worker": 4, 
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "use_gae": True,
+        "batch_mode": "truncate_episodes",
+
+        "advice_mode": "never_advise",
+        #[adaptive_always_advise, adaptive_decay_advise] 
+        #[always_advise, never_advise, decay_advise]
+
+        # "pre_trained_model": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/ski_pass_gate/model",
+        
+        
+
+    },
+
+}

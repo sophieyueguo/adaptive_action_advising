@@ -1,0 +1,82 @@
+{
+    # Model configuration
+    "MODEL_CONFIG": {
+        "custom_model": "actor_critic",
+        "custom_model_config": {
+            "input_conv_channels": 3,
+            "critic_share_layers": False,
+            "conv_filters": [
+                [32, [2, 2], 1],
+                ["pool", [2, 2], 2],
+                [64, [2, 2], 1],
+                [128, [2, 2], 1],
+            ],
+            "actor_layer_sizes": [[6272, 7]],
+            "critic_layer_sizes": [[6272, 1]],
+            "action_masking": True,
+        },
+    },
+
+
+    # Environment configuration
+    "ENV_CONFIG": {
+        "advice_mode": "",
+        # icra layout
+        "config": [["wwow", "owow", "owof", "owww"], ["wwow", "owow", "ofoo", "owww"], ["wwow", "owow", "ooof", "owww"], ["wwow", "owow", "ofow", "owww"]],
+          
+        "start_rooms": [[0, 0], [0, 1], [0, 2], [0, 3], 
+                        [1, 0], [1, 1], [1, 2], [1, 3], 
+                        [2, 0], [2, 1], [2, 2], [2, 3],
+                        [3, 0], [3, 1], [3, 2], [3, 3],
+                        ],
+
+        # anywhere
+        "goal_rooms": [[0, 0], [0, 1], [0, 2], [0, 3], 
+                        [1, 0], [1, 1], [1, 2], [1, 3], 
+                        [2, 0], [2, 1], [2, 2], [2, 3],
+                        [3, 0], [3, 1], [3, 2], [3, 3],
+                        ],
+
+        "room_size": 3,
+        "max_steps": 250,
+        "exploration_bonus": False,
+
+        "num_rubble": 1,
+        "rubble_reward": 1,
+    },
+
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "multi_grid_teacher",
+        "alg": "ppo",
+
+        "num_gpus": 1,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", 
+
+        "lr": 0.0015, #0.002,
+        "lambda": 0.8,
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.2,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        "entropy_coeff": 0.01, 
+        "train_batch_size": 8192, 
+        "sgd_minibatch_size": 256,
+        "num_sgd_iter": 4,
+        "num_workers": 0, 
+        "num_envs_per_worker": 5, 
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "use_gae": True,
+        "batch_mode": "truncate_episodes",
+        "advice_mode": "never_advise",
+        #"pre_trained_model": "/home/glow/workspace/aart-hri-repo/adaptive_action_advising/saved_teacher_models/14room_ignore_rubble/model",
+    }
+
+
+}

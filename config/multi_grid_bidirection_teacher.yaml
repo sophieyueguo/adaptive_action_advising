@@ -1,0 +1,78 @@
+{
+    # Model configuration
+    "MODEL_CONFIG": {
+        "custom_model": "actor_critic",
+        "custom_model_config": {
+            "input_conv_channels": 3,
+            "critic_share_layers": False,
+            "conv_filters": [
+                [32, [2, 2], 1],
+                ["pool", [2, 2], 2],
+                [64, [2, 2], 1],
+                [128, [2, 2], 1],
+            ],
+            "actor_layer_sizes": [[3200, 7]],
+            "critic_layer_sizes": [[3200, 1]],
+            "action_masking": True,
+        },
+    },
+
+
+    # Environment configuration
+    "ENV_CONFIG": {
+        "advice_mode": "",
+        # icra layout
+        "config": [["wwww"]],
+          
+        "start_rooms": [[0, 0]
+                        ],
+
+        # anywhere
+        "goal_rooms": [[0, 0]
+                        ],
+
+        "room_size": 10,
+        "max_steps": 90,
+        "exploration_bonus": False,
+
+        "num_rubble": 0,
+        "rubble_reward": 0,
+    },
+
+
+    # Base configuration including algorithm parameters
+    "BASE_CONFIG": {
+        "env": "multi_grid_bidirection",
+        "alg": "ppo",
+
+        "num_gpus": 1,
+        "num_cpus_per_worker": 1,
+        "num_cpus_for_driver": 1,
+        "framework": "torch", # Only torch supported
+
+        
+        "lr": 0.0001,
+        "lambda": 0.8,
+        "kl_coeff": 0.5,
+        "clip_rewards": False,
+        "clip_param": 0.2,
+        "vf_clip_param": 10.0,
+        "vf_loss_coeff": 0.5,
+        "entropy_coeff": 0.012, 
+        "train_batch_size": 512, 
+        "sgd_minibatch_size": 256,
+        "num_sgd_iter": 3,
+        "num_workers": 0, 
+        "num_envs_per_worker": 5, 
+        "batch_mode": "truncate_episodes",
+        "observation_filter": "NoFilter",
+
+        "use_gae": True,
+        "batch_mode": "truncate_episodes",
+
+        "advice_mode": "never_advise",
+        
+
+    },
+
+}
